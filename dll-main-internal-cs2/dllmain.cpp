@@ -10,7 +10,7 @@ BOOL WINAPI MainThread(HMODULE createModule)
 		if (localPlayerController == NULL)
 			continue;
 
-        *(int*)(localPlayerController + offsets::m_iDesiredFOV) = 144;
+		*(int*)(localPlayerController + offsets::m_iDesiredFOV) = 144;
 
 		this_thread::sleep_for(chrono::milliseconds(4));
 	}
