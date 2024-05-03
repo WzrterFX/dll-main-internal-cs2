@@ -1,33 +1,35 @@
-#include "include.h"
-#include "offsets.h"
+#include <Windows.h>
 
-BOOL WINAPI MainThread(HMODULE createModule)
+#include <thread>
+#include <chrono>
+
+BOOL WINAPI Thread(HMODULE module)
 {
 	while (true)
 	{
-		uintptr_t localPlayerController = *(uintptr_t*)(client + offsets::dwLocalPlayerController);
+		//
 
-		if (localPlayerController == NULL)
-			continue;
-
-		*(int*)(localPlayerController + offsets::m_iDesiredFOV) = 144;
-
-		this_thread::sleep_for(chrono::milliseconds(4));
+		std::this_thread::sleep_for(std::chrono::milliseconds(4));
 	}
 
-	FreeLibraryAndExitThread(createModule, 0);
-	return 0;
+	FreeLibraryAndExitThread(module, FALSE);
+	return TRUE;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  cReason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
 {
-	switch (cReason)
+	switch (reason)
 	{
-	case DLL_PROCESS_ATTACH:
-		CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)MainThread, NULL, NULL, NULL);
+		case DLL_PROCESS_ATTACH:
+		{
+			DisableThreadLibraryCalls(module);
 
-	case DLL_PROCESS_DETACH:
-		break;
+			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Thread, NULL, NULL, NULL);
+
+			break;
+		}
+
+		case DLL_PROCESS_DETACH: break;
 	}
 
 	return TRUE;
